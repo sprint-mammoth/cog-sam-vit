@@ -10,11 +10,6 @@ import tempfile
 from segment_anything import sam_model_registry, SamPredictor
 
 
-class Output(BaseModel):
-    file: File
-    filename: str
-
-
 class Predictor(BasePredictor):
     def setup(self) -> None:
         """Load the model into memory to make running multiple predictions efficient"""
@@ -27,35 +22,36 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
-        source_image: File = Input(description="input image file-like object"),
+        source_image: Path = Input(description="input image file handler"),
         model_type: str = Input(
             description="ViT image encoder", 
             choices=["vit_h", "vit_l", "vit_b"], 
             default="vit_h"
         ),
-    ) -> Output:
+    ) -> Path:
         """Run a single prediction on the model"""
-        # processed_input = preprocess(image)
-        image_content = source_image.read()
-        nparr = np.frombuffer(image_content, np.uint8)
-        imagedata = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        try:
+            # processed_input = preprocess(image)
+            imagedata = cv2.imread(str(source_image), cv2.IMREAD_COLOR)
 
-        # Check if image was successfully loaded
-        if imagedata is None:
-            raise ValueError(f"Could not open or read the image")
-        
-        # Convert the image from BGR to RGB format
-        image_rgb = cv2.cvtColor(imagedata, cv2.COLOR_BGR2RGB)
+            # Check if image was successfully loaded
+            if imagedata is None:
+                raise ValueError(f"Could not open or read the image")
+            
+            # Convert the image from BGR to RGB format
+            image_rgb = cv2.cvtColor(imagedata, cv2.COLOR_BGR2RGB)
 
-        # output = self.model(processed_image)
-        self.predictor.set_image(image_rgb)
-        image_embedding = self.predictor.get_image_embedding().cpu().numpy()
+            # output = self.model(processed_image)
+            self.predictor.set_image(image_rgb)
+            image_embedding = self.predictor.get_image_embedding().cpu().numpy()
 
-        # return postprocess(output)
-        # Save the image embedding to a temporary numpy array file
-        # This file will automatically be deleted by Cog after it has been returned.
-        with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
-            np.save(temp_file.name, image_embedding)
-            temp_path = temp_file.name
+            # return postprocess(output)
+            # Save the image embedding to a temporary numpy array file
+            # This file will automatically be deleted by Cog after it has been returned.
+            with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
+                np.save(temp_file.name, image_embedding)
+                temp_path = temp_file.name
 
-        return Path(temp_path)
+            return Path(temp_path)
+        except Exception as e:
+            raise ValueError(f"Error processing image: {e}")
