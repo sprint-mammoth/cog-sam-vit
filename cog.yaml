@@ -6,9 +6,14 @@ build:
   gpu: true
 
   # a list of ubuntu apt packages to install
-  # system_packages:
-  #   - "libgl1-mesa-glx"
-  #   - "libglib2.0-0"
+  system_packages:
+    - "libgl1-mesa-glx"
+    - "libglib2.0-0"
+    # - cmake
+    # - zip
+    # - ffmpeg
+    # - libsm6 
+    # - libxext6
 
   # python version >= 3.8, pytorch>=1.7 and torchvision>=0.8
   python_version: "3.10"
