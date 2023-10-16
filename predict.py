@@ -44,15 +44,17 @@ class Predictor(BasePredictor):
             print("successfully make image embedding\n")
 
             # return postprocess(output)
-            # Save the image embedding to a BytesIO object
-            output_buffer = io.BytesIO()
-            np.save(output_buffer, image_embedding)
-            
-            # Move the pointer to the beginning of the buffer
-            output_buffer.seek(0)
+            # At the start of your predict function, use a NamedTemporaryFile:
+            temp_file = tempfile.NamedTemporaryFile(suffix=".npy", delete=False)
 
-            # return a File(File-like object) to HTTP request
-            return File(output_buffer)
+            # Save your numpy array to this file
+            np.save(temp_file, image_embedding)
+
+            # Ensure file pointer is at the beginning
+            temp_file.seek(0)
+
+            # Return the file handle
+            return File(temp_file)
         
             # Save the image embedding to a temporary numpy array file
             # This file will automatically be deleted by Cog after it has been returned.
