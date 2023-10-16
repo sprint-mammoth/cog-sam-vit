@@ -44,7 +44,7 @@ class Predictor(BasePredictor):
             print("successfully make image embedding\n")
 
             # return postprocess(output)
-            # At the start of your predict function, use a NamedTemporaryFile:
+            ''' # At the start of your predict function, use a NamedTemporaryFile:
             with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 if temp_file is None:
                     raise ValueError(f"Could not create temporary file")
@@ -53,14 +53,14 @@ class Predictor(BasePredictor):
                 # Ensure file pointer is at the beginning
                 temp_file.seek(0)
                 # Return the file handle
-                return temp_file
+                return File(temp_file)'''
         
             # Save the image embedding to a temporary numpy array file
             # This file will automatically be deleted by Cog after it has been returned.
-            '''with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
+            with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 np.save(temp_file.name, image_embedding)
                 temp_path = temp_file.name
 
-            return Path(temp_path)'''
+            return Path(temp_path)
         except Exception as e:
             raise ValueError(f"Error processing image: {e}")
