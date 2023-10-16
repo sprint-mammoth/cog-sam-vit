@@ -1,7 +1,7 @@
 # Prediction interface for Cog ⚙️
 # https://github.com/replicate/cog/blob/main/docs/python.md
 
-from cog import BasePredictor, BaseModel, Input, Path, File
+from cog import BasePredictor, Input, Path
 import torch
 import numpy as np
 import cv2
@@ -23,16 +23,11 @@ class Predictor(BasePredictor):
     def predict(
         self,
         source_image: Path = Input(description="input image file handler"),
-        model_type: str = Input(
-            description="ViT image encoder", 
-            choices=["vit_h", "vit_l", "vit_b"], 
-            default="vit_h"
-        ),
     ) -> Path:
         """Run a single prediction on the model"""
         try:
             # processed_input = preprocess(image)
-            imagedata = cv2.imread(str(source_image), cv2.IMREAD_COLOR)
+            imagedata = cv2.imread(str(source_image))
 
             # Check if image was successfully loaded
             if imagedata is None:
