@@ -6,6 +6,7 @@ import torch
 import numpy as np
 import cv2
 import io
+import tempfile
 from segment_anything import sam_model_registry, SamPredictor
 
 
@@ -51,12 +52,10 @@ class Predictor(BasePredictor):
         image_embedding = self.predictor.get_image_embedding().cpu().numpy()
 
         # return postprocess(output)
-        # Save the image embedding as a numpy array file
-        output_path = "image_embedding.npy"
-        np.save(output_path, image_embedding)
-        
-        # Open the saved file and convert its content to an io.BytesIO instance
-        with open(output_path, "rb") as f:
-            file_content = io.BytesIO(f.read())
+        # Save the image embedding to a temporary numpy array file
+        # This file will automatically be deleted by Cog after it has been returned.
+        with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
+            np.save(temp_file.name, image_embedding)
+            temp_path = temp_file.name
 
-        return Output(filename=output_path, file=file_content)
+        return Path(temp_path)
