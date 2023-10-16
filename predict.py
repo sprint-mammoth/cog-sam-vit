@@ -1,7 +1,7 @@
 # Prediction interface for Cog ⚙️
 # https://github.com/replicate/cog/blob/main/docs/python.md
 
-from cog import BasePredictor, Input, Path
+from cog import BasePredictor, Input, Path, File
 import torch
 import numpy as np
 import cv2
@@ -23,7 +23,7 @@ class Predictor(BasePredictor):
     def predict(
         self,
         source_image: Path = Input(description="input image file handler"),
-    ) -> Path:
+    ) -> File:
         """Run a single prediction on the model"""
         try:
             # processed_input = preprocess(image)
@@ -40,13 +40,26 @@ class Predictor(BasePredictor):
             self.predictor.set_image(image_rgb)
             image_embedding = self.predictor.get_image_embedding().cpu().numpy()
 
+            print(image_embedding.shape)
+            print("successfully make image embedding\n")
+
             # return postprocess(output)
+            # Save the image embedding to a BytesIO object
+            output_buffer = io.BytesIO()
+            np.save(output_buffer, image_embedding)
+            
+            # Move the pointer to the beginning of the buffer
+            output_buffer.seek(0)
+
+            # return a File(File-like object) to HTTP request
+            return File(output_buffer)
+        
             # Save the image embedding to a temporary numpy array file
             # This file will automatically be deleted by Cog after it has been returned.
-            with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
+            '''with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 np.save(temp_file.name, image_embedding)
                 temp_path = temp_file.name
 
-            return Path(temp_path)
+            return Path(temp_path)'''
         except Exception as e:
             raise ValueError(f"Error processing image: {e}")
