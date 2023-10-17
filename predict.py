@@ -5,7 +5,7 @@ from cog import BasePredictor, BaseModel, Input, Path
 import numpy as np
 import cv2
 # import io
-# import tempfile
+import tempfile
 from segment_anything import sam_model_registry, SamPredictor
 
 
@@ -37,7 +37,7 @@ class Predictor(BasePredictor):
     def predict(
         self,
         source_image: Path = Input(description="input image file handler"),
-    ) -> Embedding:
+    ):
         """Run a single prediction on the model"""
         try:
             # processed_input = preprocess(image)
@@ -59,11 +59,11 @@ class Predictor(BasePredictor):
             print("successfully make image embedding\n")
 
             # return postprocess(output)
-            # flatten the image embedding and return it as a list of float
+            '''# flatten the image embedding and return it as a list of float
             output = Embedding(shape=list(shape), embedding=[float(x) for x in np.array(image_embedding).flatten().tolist()])
-            return output
+            return output'''
 
-            ''' # At the start of your predict function, use a NamedTemporaryFile:
+            '''# At the start of your predict function, use a NamedTemporaryFile:
             with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 if temp_file is None:
                     raise ValueError(f"Could not create temporary file")
@@ -74,13 +74,13 @@ class Predictor(BasePredictor):
                 # Return the file handle
                 return File(temp_file)'''
         
-            '''# Save the image embedding to a temporary numpy array file
+            # Save the image embedding to a temporary numpy array file
             # This file will automatically be deleted by Cog after it has been returned.
             with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 np.save(temp_file.name, image_embedding)
                 temp_path = temp_file.name
                 print(f"embedding file is saved to temp_path: {temp_path}\n")
 
-            return Path(temp_path)'''
+            return Path(temp_path)
         except Exception as e:
             raise ValueError(f"Error processing image: {e}")
