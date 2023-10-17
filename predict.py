@@ -10,7 +10,7 @@ from segment_anything import sam_model_registry, SamPredictor
 
 
 class Embedding(BaseModel):
-    shape: tuple[int, int, int, int]
+    shape: list[int] # default: [1, 256, 64, 64]
     embedding: list[float]
 
 
@@ -24,13 +24,13 @@ class Predictor(BasePredictor):
         sam.to(device='cuda')
         self.predictor = SamPredictor(sam)
 
-    def reshape_embedding(self, embedding_list: list[float], shape: tuple[int, int, int, int]=(1, 256, 64, 64)) -> np.ndarray:
+    def reshape_embedding(self, embedding_list: list[float], shape: list[int]=[1, 256, 64, 64]) -> np.ndarray:
         """Reshape the embedding_list to the orignal shape"""
         # Convert list to numpy array
         flattened_array = np.array(embedding_list)
 
         # Reshape the flattened array to its original shape
-        original_shape_array = flattened_array.reshape(shape)
+        original_shape_array = flattened_array.reshape(tuple(shape))
 
         return original_shape_array
     
@@ -60,7 +60,7 @@ class Predictor(BasePredictor):
 
             # return postprocess(output)
             # flatten the image embedding and return it as a list of float
-            output = Embedding(shape=shape, embedding=[float(x) for x in np.array(image_embedding).flatten().tolist()])
+            output = Embedding(shape=list(shape), embedding=[float(x) for x in np.array(image_embedding).flatten().tolist()])
             return output
 
             ''' # At the start of your predict function, use a NamedTemporaryFile:
