@@ -57,7 +57,7 @@ class Predictor(BasePredictor):
         
             # Save the image embedding to a temporary numpy array file
             # This file will automatically be deleted by Cog after it has been returned.
-            with tempfile.NamedTemporaryFile() as temp_file:
+            with tempfile.NamedTemporaryFile(suffix=".npy", delete=False) as temp_file:
                 np.save(temp_file.name, image_embedding)
                 temp_path = temp_file.name
                 print(f"embedding file is saved to temp_path: {temp_path}\n")
