@@ -23,7 +23,7 @@ class Predictor(BasePredictor):
     def predict(
         self,
         source_image: Path = Input(description="input image file handler"),
-    ) -> File:
+    ) -> Path:
         """Run a single prediction on the model"""
         try:
             # processed_input = preprocess(image)
@@ -60,6 +60,7 @@ class Predictor(BasePredictor):
             with tempfile.NamedTemporaryFile() as temp_file:
                 np.save(temp_file.name, image_embedding)
                 temp_path = temp_file.name
+                print(f"embedding file is saved to temp_path: {temp_path}\n")
 
             return Path(temp_path)
         except Exception as e:
