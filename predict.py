@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 # import io
 import tempfile
+from typing import Any
 from segment_anything import sam_model_registry, SamPredictor
 
 
@@ -37,7 +38,7 @@ class Predictor(BasePredictor):
     def predict(
         self,
         source_image: Path = Input(description="input image file handler"),
-    ):
+    ) -> Any:
         """Run a single prediction on the model"""
         try:
             # processed_input = preprocess(image)
